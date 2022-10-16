@@ -1,10 +1,11 @@
 local WeightedChoice = {}
 WeightedChoice.__index = WeightedChoice
 
-function WeightedChoice.new()
+function WeightedChoice.new(seed)
     local self = setmetatable({}, WeightedChoice)
     self._weights = {}
     self._choices = {}
+    self._random = Random.new(seed)
     self._weightTotal = 0
     return self
 end
@@ -16,7 +17,7 @@ function WeightedChoice:AddChoice(choice, weight)
 end
 
 function WeightedChoice:Poll()
-    local randomChance = math.random() * self._weightTotal
+    local randomChance = self._random:NextNumber()
     local weightSum = 0
 
     for index, weight in self._weights do
