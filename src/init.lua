@@ -21,12 +21,12 @@ function WeightedChoice:AddChoice(choice, weight)
 end
 
 function WeightedChoice:Choose()
-    local randomChance = self._random:NextNumber()
+    local pollPoint = self._random:NextNumber() * self._weightTotal
     local weightSum = 0
 
     for index, weight in self._weights do
         weightSum += weight
-        if randomChance <= weightSum then
+        if pollPoint <= weightSum then
             return self._choices[index]
         end
     end
