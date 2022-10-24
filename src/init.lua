@@ -5,8 +5,12 @@ function WeightedChoice.new(seed)
     local self = setmetatable({}, WeightedChoice)
     self._weights = {}
     self._choices = {}
-    self._random = Random.new(seed)
     self._weightTotal = 0
+
+    -- Roblox's Random.new() throws an exception if 'nil' is passed in.
+    -- Passing in nothing, however, is perfectly fine and expected behavior.
+    self._random = if seed then Random.new(seed) else Random.new()
+
     return self
 end
 
@@ -16,7 +20,7 @@ function WeightedChoice:AddChoice(choice, weight)
     self._weightTotal += weight
 end
 
-function WeightedChoice:Poll()
+function WeightedChoice:Choose()
     local randomChance = self._random:NextNumber()
     local weightSum = 0
 
