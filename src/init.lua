@@ -1,15 +1,22 @@
+local MAX_SEED = 1_000_000_000
+
 local WeightedChoice = {}
 WeightedChoice.__index = WeightedChoice
 
-function WeightedChoice.new(seed)
+local seedGenerator = Random.new()
+
+export type WeightedChoice<T> = {
+    AddChoice: (self: WeightedChoice<T>, choice: T, weight: number) -> (),
+    Choose: (self: WeightedChoice<T>) -> T,
+}
+
+function WeightedChoice.new(random: Random)
     local self = setmetatable({}, WeightedChoice)
     self._weights = {}
     self._choices = {}
     self._weightTotal = 0
 
-    -- Roblox's Random.new() throws an exception if 'nil' is passed in.
-    -- Passing in nothing, however, is perfectly fine and expected behavior.
-    self._random = if seed then Random.new(seed) else Random.new()
+    self._random = random or Random.new(seedGenerator:NextInteger(0, MAX_SEED))
 
     return self
 end
@@ -30,6 +37,8 @@ function WeightedChoice:Choose()
             return self._choices[index]
         end
     end
+
+    error("WeightedChoice:Choose() - This should never happen.")
 end
 
 return WeightedChoice
