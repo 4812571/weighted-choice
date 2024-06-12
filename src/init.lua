@@ -1,44 +1,32 @@
-local MAX_SEED = 1_000_000_000
+--!strict
 
-local WeightedChoice = {}
-WeightedChoice.__index = WeightedChoice
-
-local seedGenerator = Random.new()
-
-export type WeightedChoice<T> = {
-    AddChoice: (self: WeightedChoice<T>, choice: T, weight: number) -> (),
-    Choose: (self: WeightedChoice<T>) -> T,
+export type Choice<T> = {
+    Choice: T,
+    Weight: number,
 }
 
-function WeightedChoice.new(random: Random)
-    local self = setmetatable({}, WeightedChoice)
-    self._weights = {}
-    self._choices = {}
-    self._weightTotal = 0
+local function WeightedChoice<T>(choices: {Choice<T>}): (random: Random) -> T
+    local weightTotal = 0
 
-    self._random = random or Random.new(seedGenerator:NextInteger(0, MAX_SEED))
-
-    return self
-end
-
-function WeightedChoice:AddChoice(choice, weight)
-    table.insert(self._choices, choice)
-    table.insert(self._weights, weight)
-    self._weightTotal += weight
-end
-
-function WeightedChoice:Choose()
-    local pollPoint = self._random:NextNumber() * self._weightTotal
-    local weightSum = 0
-
-    for index, weight in self._weights do
-        weightSum += weight
-        if pollPoint <= weightSum then
-            return self._choices[index]
-        end
+    for _, choice in choices do
+        weightTotal += choice.Weight
     end
 
-    error("WeightedChoice:Choose() - This should never happen.")
+    local function Choose(random: Random)
+        local pollPoint = random:NextNumber() * weightTotal
+        local weightSum = 0
+
+        for _, choice in choices do
+            weightSum += choice.Weight
+            if pollPoint <= weightSum then
+                return choice.Choice
+            end
+        end
+
+        error("unreachable!")
+    end
+
+    return Choose
 end
 
 return WeightedChoice

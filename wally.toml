@@ -1,6 +1,6 @@
 [package]
 name = "4812571/weighted-choice"
-version = "1.0.3"
+version = "2.0.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 author = "4812571"
