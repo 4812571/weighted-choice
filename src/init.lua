@@ -1,25 +1,20 @@
 --!strict
 
-export type Choice<T> = {
-    Choice: T,
-    Weight: number,
-}
-
-local function WeightedChoice<T>(choices: {Choice<T>}): (random: Random) -> T
+local function WeightedChoice<T>(choices: {[T]: number}): (random: Random) -> T
     local weightTotal = 0
 
-    for _, choice in choices do
-        weightTotal += choice.Weight
+    for _, weight in choices do
+        weightTotal += weight
     end
 
     local function Choose(random: Random)
         local pollPoint = random:NextNumber() * weightTotal
         local weightSum = 0
 
-        for _, choice in choices do
-            weightSum += choice.Weight
+        for choice, weight in choices do
+            weightSum += weight
             if pollPoint <= weightSum then
-                return choice.Choice
+                return choice
             end
         end
 
